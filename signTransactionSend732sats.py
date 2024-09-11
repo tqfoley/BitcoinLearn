@@ -87,7 +87,7 @@ signedTransaction = (btcVersion + oneAsVarInt + # one since spending one output
 expected2 = '01000000015e215bb23908c17d4a5843193240da0239de80780475e9af3aa587e3cda7ef8c000000006b4830450221008b1020af415df28930688ca8c70205737605f329efa10e9227ce6f2d93dcdf100220798e3dcd305aeff882b3fce1eeb53e40fb853cbad9685efe45383d4eb5516088012103ec6b306cf02e5e0d8b64574c85fd24b4cd43d85a92e9d36a837aa298245ec586fdffffff01dc020000000000001976a91491c794eb0d1b7760639b7c5a863521b09c31d4de88ac00000000' # https://blockstream.info/api/tx/f2f051f538810a205ddf2b1478d50f929dd079550af3cce20827a38dcb9ee9be/hex
 expected = (urllib.request.urlopen("https://blockstream.info/api/tx/f2f051f538810a205ddf2b1478d50f929dd079550af3cce20827a38dcb9ee9be/hex").read()).decode("utf-8")
 
-if(signedTransaction == expected):
+if(signedTransaction == expected or signedTransaction == expected2):
     print('MATCH!')
 else:
     print('BAD NO MATCH')
