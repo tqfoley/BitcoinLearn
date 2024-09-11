@@ -17,9 +17,13 @@ def reverse_hex_string_and_every_two_chars_to_swap_endianness(s): # big endian t
         result += pair[::-1]
     return result[::-1]
 
-twoToPower32 = (256*256*256*256)
-prime = twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32 - twoToPower32 - 977
-private_key = PrivateKey(secret=10185666355360570128723759600355014748330344510962090128535490833542411751071%prime)
+P = 2**256 - 2**32 - 977 # prime for finite field
+N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
+G = S256Point(
+    0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
+    0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)
+
+private_key = PrivateKey(secret=10185666355360570128723759600355014748330344510962090128535490833542411751071%P)
 
 btcVersion = '01000000'
 oneAsVarInt = '01' # page 92 Programming bitcoin
@@ -72,9 +76,23 @@ toSign = (btcVersion + oneAsVarInt + # one since spending one output
           oneAsVarInt + amountToSend + # one since sending single amount (no change address) extra sats are used for the fee
           count_hex_bytes(PkScriptSend) + PkScriptSend + timelock)
 
+def signTrans(private, z):
+    k = private.deterministic_k(z)
+    # r is the x coordinate of the resulting point k*G
+    r = (k * G).x.num
+    # remember 1/k = pow(k, N-2, N)
+    k_inv = pow(k, N - 2, N)
+    # s = (z+r*secret) / k
+    s = (z + r * private.secret) * k_inv % N
+    if s > N / 2:
+        s = N - s
+    # return an instance of Signature:
+    # Signature(r, s)
+    return Signature(r, s)
+
 tx_obj = Tx.parse(BytesIO(bytes.fromhex(toSign)), testnet=False)
 z = tx_obj.sig_hash(0)
-derhex = private_key.sign(z).der().hex()
+derhex = signTrans(private_key, z).der().hex()
 sechex = private_key.point.sec().hex()
 
 SignatureScript = count_hex_bytes(derhex+oneAsVarInt) + derhex + oneAsVarInt + count_hex_bytes(sechex) + sechex
@@ -97,7 +115,18 @@ z = int.from_bytes(h256, 'big')
 point = S256Point.parse(bytes.fromhex(sechex))
 sig = Signature.parse(bytes.fromhex(derhex))
 
-if(point.verify(z, sig) == True):
+def verifyTrans( z, sig, s256point):
+    # By Fermat's Little Theorem, 1/s = pow(s, N-2, N)
+    s_inv = pow(sig.s, N - 2, N)
+    # u = z / s
+    u = z * s_inv % N
+    # v = r / s
+    v = sig.r * s_inv % N
+    # u*G + v*P should have as the x coordinate, r
+    total = u * G + v * s256point
+    return total.x.num == sig.r
+
+if(verifyTrans(z, sig, point) == True):
     print('Transaction is valid!')
 else:
     print('Error: Not Valid Transaction')
