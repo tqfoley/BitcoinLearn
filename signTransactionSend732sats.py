@@ -27,7 +27,7 @@ timelock = '00000000' # transaction is immediately sent page 94 Programming bitc
 sequence = 'fdffffff' # value doesn't matter if timelock is zero
 
 previousTransactionId = reverse_hex_string_and_every_two_chars_to_swap_endianness('8cefa7cde387a53aafe975047880de3902da40321943584a7dc10839b25b215e') # the previous transaction output we are trying to spend as an input https://www.blockchain.com/explorer/transactions/btc/8cefa7cde387a53aafe975047880de3902da40321943584a7dc10839b25b215e
-previousTransactionOutput = '14b2478f4a029c3fa09f71d32ff5a5bbd3bd79b0b7' #look on blockchain for this, it is the output that is now being spent as an input
+previousTransactionOutput = 'b2478f4a029c3fa09f71d32ff5a5bbd3bd79b0b7' #look on blockchain for this, it is the output that is now being spent as an input
 previousTransactionIndex = '00000000' # zero, it was the first transaction
 amountToSend = reverse_hex_string_and_every_two_chars_to_swap_endianness('00000000000002dc') # 0.00000732 BTC  732 / 100 000 000 = 256*2(2) + 16*13(d) + 12(c)  
 destinationAddress = hex(base58.b58decode_int('1EHp4zm1T2yUyjEmW3H4qauTJiVEXan3Uf'))[2:-8]
@@ -46,7 +46,12 @@ sigHashAll = '01000000' # most common
 #b2478f4a029c3fa09f71d32ff5a5bbd3bd79b0b7 previous output address
 #OP_EQUALVERIFY
 #OP_CHECKSIG
-PkScriptPreviousTransaction = scriptOperationDuplicate_76 + scriptOperationHash160_a9 + previousTransactionOutput + scriptOperationEqualVerify_88 + scriptOperationCheckSig_ac
+PkScriptPreviousTransaction = (scriptOperationDuplicate_76 +
+                               scriptOperationHash160_a9 +
+                               count_hex_bytes(previousTransactionOutput) +
+                               previousTransactionOutput +
+                               scriptOperationEqualVerify_88 +
+                               scriptOperationCheckSig_ac)
 
 #Pkscript
 #OP_DUP
@@ -54,7 +59,12 @@ PkScriptPreviousTransaction = scriptOperationDuplicate_76 + scriptOperationHash1
 #91c794eb0d1b7760639b7c5a863521b09c31d4de destination address
 #OP_EQUALVERIFY
 #OP_CHECKSIG
-PkScriptSend = scriptOperationDuplicate_76 + scriptOperationHash160_a9 + count_hex_bytes(destinationAddress) + destinationAddress + scriptOperationEqualVerify_88 + scriptOperationCheckSig_ac
+PkScriptSend = (scriptOperationDuplicate_76 +
+                scriptOperationHash160_a9 +
+                count_hex_bytes(destinationAddress) +
+                destinationAddress +
+                scriptOperationEqualVerify_88 +
+                scriptOperationCheckSig_ac)
 
 toSign = (btcVersion + oneAsVarInt + # one since spending one output
           previousTransactionId + previousTransactionIndex + 
