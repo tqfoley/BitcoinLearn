@@ -6,7 +6,7 @@ Most of this is based on the information from Jimmy Song's book Programming Bitc
 
 
 
-#signTransactionSend732sats.py Example
+# signTransactionSend732sats.py Example
 Example to create transaction that is in block 860,006.
 Wallet HFf1CkLieNb6Wn44oFAC56BiQhuxzCdFd with 0.00001500 BTC sends 0.00000732 BTC to 1EHp4zm1T2yUyjEmW3H4qauTJiVEXan3Uf
 Links
