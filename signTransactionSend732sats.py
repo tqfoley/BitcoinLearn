@@ -42,6 +42,7 @@ scriptOperationDuplicate_76 = '76'
 scriptOperationHash160_a9 = 'a9'
 scriptOperationEqualVerify_88 = '88'
 
+sigHashAllOneByte = '01'
 sigHashAll = '01000000' # most common
 
 #Pkscript
@@ -95,7 +96,7 @@ z = tx_obj.sig_hash(0)
 derhex = signTrans(private_key, z).der().hex()
 sechex = private_key.point.sec().hex()
 
-SignatureScript = count_hex_bytes(derhex+oneAsVarInt) + derhex + oneAsVarInt + count_hex_bytes(sechex) + sechex
+SignatureScript = count_hex_bytes(derhex + sigHashAllOneByte) + derhex + sigHashAllOneByte + count_hex_bytes(sechex) + sechex
 
 signedTransaction = (btcVersion + oneAsVarInt + # one since spending one output
                      previousTransactionId + previousTransactionIndex + 
