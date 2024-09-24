@@ -5,17 +5,7 @@ from ch13.helper import hash256
 from ch13.tx import Tx
 from ch13.ecc import S256Point, PrivateKey, Signature
 # Chapter 13 from Programming Bitcoin book https://github.com/jimmysong/programmingbitcoin/blob/master/ch13.asciidoc
-
-def count_hex_bytes(input_string):
-    count = int(len(input_string)/2)
-    return hex(count)[2:]
-
-def reverse_hex_string_and_every_two_chars_to_swap_endianness(s): # big endian to little endian and vice versa on hexidecimal strings https://en.wikipedia.org/wiki/Endianness
-    result = ''
-    for i in range(0, len(s), 2):
-        pair = s[i:i+2]
-        result += pair[::-1]
-    return result[::-1]
+from myhelper import count_hex_bytes, reverse_hex_string_and_every_two_chars_to_swap_endianness, count_chars_and_checksum, sats_in_hex
 
 twoToPower32 = (256*256*256*256)
 prime = twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32*twoToPower32 - twoToPower32 - 977

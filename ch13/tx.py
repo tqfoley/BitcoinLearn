@@ -2,7 +2,8 @@ from io import BytesIO
 from unittest import TestCase
 
 import json
-import requests
+# import requests
+import urllib.request
 
 from ch13.ecc import PrivateKey
 from ch13.helper import (
@@ -30,9 +31,28 @@ class TxFetcher:
     def fetch(cls, tx_id, testnet=False, fresh=False):
         if fresh or (tx_id not in cls.cache):
             url = '{}/tx/{}/hex'.format(cls.get_url(testnet), tx_id)
-            response = requests.get(url)
+            #response = requests.get(url)
+
+            responsetext = (urllib.request.urlopen("https://blockstream.info/api/tx/" + tx_id +"/hex").read()).decode("utf-8")
             try:
-                raw = bytes.fromhex(response.text.strip())
+                raw = bytes.fromhex(responsetext.strip())
+                #raw = ''#bytes.fromhex(response.text.strip())
+                if(tx_id == 'f2f051f538810a205ddf2b1478d50f929dd079550af3cce20827a38dcb9ee9be'):
+                    #~384 chars  192 byes
+                    raw2 = bytes.fromhex('01000000015e215bb23908c17d4a5843193240da0239de80780475e9af3aa587e3cda7ef8c000000006b4830450221008b1020af415df28930688ca8c70205737605f329efa10e9227ce6f2d93dcdf100220798e3dcd305aeff882b3fce1eeb53e40fb853cbad9685efe45383d4eb5516088012103ec6b306cf02e5e0d8b64574c85fd24b4cd43d85a92e9d36a837aa298245ec586fdffffff01dc020000000000001976a91491c794eb0d1b7760639b7c5a863521b09c31d4de88ac00000000')
+                    if(raw != raw2):
+                        raise("Error")
+                #two inputs
+                if(tx_id == 'd9eb3f1982e87d2a9cbc422d7db2d95c59b12dd6e19df37a8b9bc3b273454cdc'):
+                   #~680 chars  338 byes
+                   raw2 = bytes.fromhex('0100000002ed49a1742961b79065ed785e802c2887cd5afebecb9afc3f26d60ef0950a7133000000006a473044022005263f96d39c199db5e23118586e07558b3c1c88509b21bc129ddb8f2df2fb9f0220746dcb5f96fa4fa6d9719e8004e89ef92e6aa6f97df8e6de68bd19390ba0ca3c012103428fec1cfda3c628a2f2af1ee62b1b0f6b737454eb76b625c9cabe3a63ad55ddfdffffffbee99ecb8da32708e2ccf30a5579d09d920fd578142bdf5d200a8138f551f0f2000000006a47304402202be53ba39fe6bc246c9aab7e0908d9312eb2d665a56cc1d74428351dcc83f18102206e619d7581e9bda4c58e0586b552694d8fac117ea3473afbd2331c7b89097d5a0121039024fc4cc4350491cc38a0a2678b701a20f905254ae33cd5393e020d91dd9af1fdffffff0140070000000000001976a91491c794eb0d1b7760639b7c5a863521b09c31d4de88ac00000000')
+                   if(raw != raw2):
+                        raise("Error")
+                if(tx_id == '8cefa7cde387a53aafe975047880de3902da40321943584a7dc10839b25b215e'):
+                    #250 bytes newer address
+                    raw2 = bytes.fromhex('010000000001016ef420db11e5ed666092313f8d1d85b00fc53cb20d995c18b397292050771fb5130000001716001475efaaf40d4b740d3fa9318b5b82984ae12b9470fdffffff02dc050000000000001976a914b2478f4a029c3fa09f71d32ff5a5bbd3bd79b0b788ac8cd6f5050000000017a9142acf80dd610dfc8517a6422c3aa6daf65b7bf5408702483045022100db2144d98a6e6d2904e63b6b7ba03e575312f6b248d82d6e96e59568ea37ca9a022073215cdcf4e904ebe7e5684869b5432d833d9b82cf765e416d3defc63350b8a90121024cba6145bcd5762564bb0be8ff61791b14858a71c166c21fce268547c5aff43000000000')
+                    if(raw != raw2):
+                        raise("Error")
             except ValueError:
                 raise ValueError('unexpected response: {}'.format(response.text))
             tx = Tx.parse(BytesIO(raw), testnet=testnet)
