@@ -148,6 +148,8 @@ class Point:
             return
         # make sure that the elliptic curve equation is satisfied
         # y**2 == x**3 + a*x + b
+        #print((self.y**2))
+        #print((self.x**3))
         if self.y**2 != self.x**3 + a * x + b:
             # if not, throw a ValueError
             raise ValueError('({}, {}) is not on the curve'.format(x, y))

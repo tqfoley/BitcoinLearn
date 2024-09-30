@@ -13,7 +13,8 @@ G = S256Point(
     0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,
     0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)
 
-private_key = PrivateKey(secret=10185666355360570128723759600355014748330344510962090128535490833542411751071%P)
+private_key_secret = 10185666355360570128723759600355014748330344510962090128535490833542411751071
+private_key = PrivateKey(secret=private_key_secret%P)
 
 btcVersion = '01000000'
 oneAsVarInt = '01' # page 92 Programming bitcoin
@@ -28,7 +29,6 @@ amountToSend2 = reverse_hex_string_and_every_two_chars_to_swap_endianness(sats_i
 
 if(amountToSend != amountToSend2):
     raise ValueError("Should match")
-
 
 destinationAddress = hex(base58.b58decode_int('1EHp4zm1T2yUyjEmW3H4qauTJiVEXan3Uf'))[2:-8]
 
